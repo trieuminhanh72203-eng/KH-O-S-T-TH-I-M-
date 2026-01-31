@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Discrete Choice Experiment Survey</title>
+    
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3126/3126647.png">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .timer {
+            font-weight: bold;
+            color: red;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        /* Căn lề trái cho toàn bộ nội dung */
+        h1, h3, p, table {
+            text-align: left !important;
+        }
+        .info-table th, .info-table td {
+            padding: 10px;
+            vertical-align: top; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chào Mừng Bạn Đến Với Khảo Sát!</h1>
+        <p>
+            Khảo sát này nhằm tìm hiểu sở thích của Bạn về các dịch vụ nâng cao chất lượng đào tạo. Bạn sẽ được yêu cầu chọn giữa các dịch vụ khác nhau dựa trên các thuộc tính như E-learning, Chi phí tăng thêm, Người cung cấp dịch vụ, Quy mô lớp học, Người hướng dẫn cá nhân, Cơ sở vật chất và trải nghiệm học tập. Phản hồi của bạn sẽ giúp chúng tôi hiểu rõ hơn về sở thích của sinh viên. Vui lòng đọc kỹ hướng dẫn trước khi bắt đầu. Xin cảm ơn!
+        </p>
+
+        <h3>Tổng quan về Khảo sát</h3>
+        <p>
+            Cấu trúc khảo sát bao gồm:<br>
+            - Tham gia đánh giá 13 tình huống giả định để lựa chọn phương án dịch vụ đào tạo mà bạn ưu tiên nhất.<br>
+            - 06 câu hỏi thông tin người tham gia.<br>
+            - Phần phản hồi: Nơi bạn đóng góp ý kiến trực tiếp cho nhóm nghiên cứu.    
+        </p>
+        <p>
+            Bạn cần dành ít nhất 10 giây trên trang này trước khi bắt đầu khảo sát. Nút "Bắt đầu khảo sát" sẽ được kích hoạt sau khi bộ đếm thời gian kết thúc. Cảm ơn sự đóng góp quý báu của bạn!
+        </p>
+        <p>Thời gian còn lại: <span class="timer" id="timer">10</span> giây</p>
+        <button id="startSurveyBtn" class="btn btn-primary" disabled>Bắt đầu khảo sát</button>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let timeLeft = 10;
+            const timerDisplay = $("#timer");
+            const startBtn = $("#startSurveyBtn");
+
+            // Countdown timer
+            const countdown = setInterval(function() {
+                timeLeft--;
+                timerDisplay.text(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    startBtn.prop("disabled", false);
+                    timerDisplay.text("0");
+                }
+            }, 1000);
+
+            // Array of Google Forms links
+            const surveyLinks = [
+                "https://docs.google.com/forms/d/e/1FAIpQLScmTg07iuaUBlayxd_L1_q3vJv_pBNYeT4KSOqJInJ56gDgdg/viewform?usp=header",
+                "https://docs.google.com/forms/d/e/1FAIpQLScltd5TsYkEeX5M3kGs8SU6W2PQGFamCEDM14Ca2NYKUpVQ_g/viewform?usp=header"
+            ];
+
+            if (!localStorage.getItem("formCounts")) {
+                localStorage.setItem("formCounts", JSON.stringify({ form1: 0, form2: 0 }));
+            }
+
+            function getFormCounts() {
+                return JSON.parse(localStorage.getItem("formCounts"));
+            }
+
+            function updateFormCounts(selectedForm) {
+                let counts = getFormCounts();
+                if (selectedForm === 0) {
+                    counts.form1 += 1;
+                } else {
+                    counts.form2 += 1;
+                }
+                localStorage.setItem("formCounts", JSON.stringify(counts));
+            }
+
+            function selectForm() {
+                let counts = getFormCounts();
+                let total = counts.form1 + counts.form2;
+                if (counts.form1 === counts.form2 || total === 0) {
+                    return Math.floor(Math.random() * 2);
+                }
+                return counts.form1 < counts.form2 ? 0 : 1;
+            }
+
+            startBtn.click(function() {
+                const selectedIndex = selectForm();
+                updateFormCounts(selectedIndex);
+                window.location.href = surveyLinks[selectedIndex];
+            });
+        });
+    </script>
+</body>
+</html>
